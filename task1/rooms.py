@@ -22,5 +22,5 @@ class RoomsFileReader():
             return rooms
         except FileNotFoundError:
             raise Exception('Json file not found')
-        except BaseException as e:
-            raise Exception("Can't process rooms file")
+        except Exception as MyException:
+            raise MyException

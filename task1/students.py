@@ -23,6 +23,6 @@ class StudentFileReader():
                 students = [Student(student['id'], student['name'], student['room']) for student in students]
             return students
         except FileNotFoundError:
-            raise Exception('Json file not found')
-        except BaseException as e:
-            raise Exception("Can't process student file")
+            raise ('Json file not found')
+        except Exception as MyException:
+            raise MyException
