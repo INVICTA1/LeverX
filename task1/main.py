@@ -11,12 +11,14 @@ class Service():
     def combine_rooms_and_students(rooms: list, students: list) -> dict:
         """Combine room and student data and return the result"""
 
-        result = {}
+        result = {'students_without_room': []}
         for room in rooms:
             result[room.id] = {'name': room.name, 'students': []}
         for student in students:
             if result.get(student.room):
                 result[student.room]['students'].append(student.name)
+            else:
+                result['students_without_room'].append(student.name)
         return result
 
 
