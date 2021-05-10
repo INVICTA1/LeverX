@@ -6,7 +6,7 @@ from students import *
 from rooms import *
 
 
-class Handler():
+class Service():
     @staticmethod
     def combine_rooms_and_students(rooms: list, students: list) -> dict:
         """Combine room and student data and return the result"""
@@ -66,7 +66,7 @@ def main():
     namespace = parser.parse_args(sys.argv[1:])
     students = StudentFileReader.read_file(namespace.students)
     rooms = RoomsFileReader.read_file(namespace.rooms)
-    result = Handler.combine_rooms_and_students(rooms, students)
+    result = Service.combine_rooms_and_students(rooms, students)
     if namespace.format == 'xml':
         output_xml(result)
     elif namespace.format == 'json':
