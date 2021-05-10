@@ -6,20 +6,18 @@ from students import *
 from rooms import *
 
 
-class Service():
-    @staticmethod
-    def combine_rooms_and_students(rooms: list, students: list) -> dict:
-        """Combine room and student data and return the result"""
+def combine_rooms_and_students(rooms: list, students: list) -> dict:
+    """Combine room and student data and return the result"""
 
-        result = {'students_without_room': []}
-        for room in rooms:
-            result[room.id] = {'name': room.name, 'students': []}
-        for student in students:
-            if result.get(student.room):
-                result[student.room]['students'].append(student.name)
-            else:
-                result['students_without_room'].append(student.name)
-        return result
+    result = {'students_without_room': []}
+    for room in rooms:
+        result[room.id] = {'name': room.name, 'students': []}
+    for student in students:
+        if result.get(student.room):
+            result[student.room]['students'].append(student.name)
+        else:
+            result['students_without_room'].append(student.name)
+    return result
 
 
 def get_parser_arguments():
@@ -68,7 +66,7 @@ def main():
     namespace = parser.parse_args(sys.argv[1:])
     students = StudentFileReader.read_file(namespace.students)
     rooms = RoomsFileReader.read_file(namespace.rooms)
-    result = Service.combine_rooms_and_students(rooms, students)
+    result = combine_rooms_and_students(rooms, students)
     if namespace.format == 'xml':
         output_xml(result)
     elif namespace.format == 'json':
