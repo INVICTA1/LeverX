@@ -15,6 +15,10 @@ Examples
 ====================
     main.py -s resources\students.json -r resources\rooms.json -f xml
 
+Library
+====================
+    pip install -r requirements.txt
+    
 Notes
 ====================
 The files to search for data are located in the resources folder
