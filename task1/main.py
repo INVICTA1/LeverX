@@ -9,14 +9,16 @@ from rooms import *
 def combine_rooms_and_students(rooms: list, students: list) -> dict:
     """Combine room and student data and return the result"""
 
-    result = {'students_without_room': []}
+    result = {}
     for room in rooms:
         result[room.id] = {'name': room.name, 'students': []}
     for student in students:
         if result.get(student.room):
             result[student.room]['students'].append(student.name)
+        elif result.get('swr'):
+            result['swr']['students_without_room'].append(student.name)
         else:
-            result['students_without_room'].append(student.name)
+            result['swr'] = {'students_without_room': []}
     return result
 
 
@@ -46,8 +48,8 @@ def output_xml(result: dict):
         data = etree.ElementTree(data)
         with open(name_file, 'wb') as file:
             data.write(file, xml_declaration=True, pretty_print=True)
-    except BaseException as e:
-        raise Exception("Can't' output XML data", e)
+    except Exception as MyException:
+        raise MyException
 
 
 def output_json(result: dict):
