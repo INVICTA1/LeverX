@@ -2,19 +2,19 @@ import json
 
 
 class Student():
-    def __init__(self, id: int, name: str, room: int, sex: chr, birthday: str):
+    def __init__(self, id: int, birthday: str, name: str, room: int, sex: chr):
         self.id = id
+        self.birthday = birthday
         self.name = name
         self.room = room
         self.sex = sex
-        self.birthday = birthday
 
     def __repr__(self):
-        return '({id}; {name};{room};{sex};{birthday})'.format(id=self.id,
-                                                               name=self.name,
-                                                               room=self.room,
-                                                               sex=self.sex,
-                                                               birthday=self.birthday)
+        return '{id},{birthday},{name},{room},{sex})'.format(id=self.id,
+                                                             birthday=self.birthday,
+                                                             name=self.name,
+                                                             room=self.room,
+                                                             sex=self.sex)
 
 
 class StudentFileReader():
