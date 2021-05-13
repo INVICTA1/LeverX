@@ -2,7 +2,7 @@ config = {
     'user': 'admin',
     'password': 'admin',
     'host': 'localhost',
-    'database': 'students',
+    'database': 'rooms',
     'port': 3306,
 }
 

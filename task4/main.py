@@ -29,24 +29,6 @@ def get_parser_arguments():
     return parser
 
 
-def load_students_to_db(db, table, students, cursor):
-    try:
-        cursor.execute('USE {db}'.format(db=db))
-        for student in students:
-            cursor.execute("INSERT INTO {table} VALUES({student})".format(table=table, student=student))
-    except Error as e:
-        raise Exception("Can't load students to db", e)
-
-
-def load_rooms_to_db(db, table, rooms, cursor):
-    try:
-        cursor.execute('USE {db}'.format(db=db))
-        for room in rooms:
-            cursor.execute("INSERT INTO {table} VALUES({room})".format(table=table, room=room))
-    except Error as e:
-        raise Exception("Can''t load students to db", e)
-
-
 def main():
     parser = get_parser_arguments()
     namespace = parser.parse_args(sys.argv[1:])
@@ -55,8 +37,8 @@ def main():
     conn = connect_to_database(config)
     if conn:
         cursor = conn.cursor()
-        load_rooms_to_db(config['database'], 'rooms', rooms, cursor)
-        load_students_to_db(config['database'], 'students', students, cursor)
+        RoomsDB.load_rooms_to_db(config['database'], rooms, cursor)
+        StudentDB.load_students_to_db(config['database'], students, cursor)
         conn.commit()
         cursor.close()
         conn.close()
