@@ -1,4 +1,5 @@
 import json
+from mysql.connector import Error
 
 
 class Room():
@@ -8,7 +9,7 @@ class Room():
         self.name = name
 
     def __repr__(self):
-        return "{id}, '{name}'".format(id=self.id, name=self.name)
+        return "({id}, {name})".format(id=self.id, name=self.name)
 
 
 class RoomsFileReader():
@@ -24,3 +25,15 @@ class RoomsFileReader():
             raise Exception('Json file not found')
         except Exception as MyException:
             raise MyException
+
+
+class RoomsDB():
+    @staticmethod
+    def load_rooms_to_db(db: str, rooms: list, cursor):
+        try:
+            cursor.execute('USE {db}'.format(db=db))
+            for room in rooms:
+                params = (room.id, room.name)
+                cursor.execute("INSERT INTO rooms VALUES(%s,%s)", params)
+        except Error as e:
+            raise Exception("Can't load students to db", e)
