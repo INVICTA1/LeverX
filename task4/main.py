@@ -1,11 +1,11 @@
 import argparse
 import sys
+import mysql.connector
+import json
+from mysql.connector import Error
 from models.students import *
 from models.rooms import *
-
-import mysql.connector
 from config import config
-from mysql.connector import Error
 
 
 def connect_to_database(config):
@@ -29,17 +29,55 @@ def get_parser_arguments():
     return parser
 
 
+def call_procedure(cursor, procedure):
+    """Call procedure and return result"""
+
+    try:
+        cursor.callproc(procedure)
+        for result in cursor.stored_results():
+            print(result)
+            print(result.fetchall())
+            return result.fetchall()
+    except (BaseException, Error) as e:
+        raise ("Can't call procedure", e)
+
+
+def output_json(result: dict, name_procedure):
+    """Output data to a JSON file"""
+
+    name_file = r'result\\' + name_procedure + '.json'
+    try:
+        with open(name_file, 'w+', encoding='utf-8', ) as file:
+            json.dump(result, file, ensure_ascii=False, indent=4)
+    except BaseException as e:
+        raise Exception("Can't' output JSON data", e)
+
+
 def main():
+    procedures = [
+        # 'usp_find_list_rooms_with_students',
+        'usp_top5_rooms_with_min_average_age',
+        # 'usp_top5_rooms_with_diff_age',
+        # 'usp_find_list_rooms_with_mixed_students',
+    ]
     parser = get_parser_arguments()
     namespace = parser.parse_args(sys.argv[1:])
-    students = StudentFileReader.read_file(namespace.students)
-    rooms = RoomsFileReader.read_file(namespace.rooms)
     conn = connect_to_database(config)
     if conn:
+        # students = StudentFileReader.read_file(namespace.students)
+        # rooms = RoomsFileReader.read_file(namespace.rooms)
         cursor = conn.cursor()
-        RoomsDB.load_rooms_to_db(config['database'], rooms, cursor)
-        StudentDB.load_students_to_db(config['database'], students, cursor)
+        # upload sql
+        # RoomsDB.load_rooms_to_db(config['database'], rooms, cursor)
+        # StudentDB.load_students_to_db(config['database'], students, cursor)
+        # добавить индекс
         conn.commit()
+        for procedure in procedures:
+            result = call_procedure(cursor, procedure)
+            if namespace.format == 'xml':
+                output_xml(result)
+            elif namespace.format == 'json':
+                output_json(result,procedure)
         cursor.close()
         conn.close()
 
