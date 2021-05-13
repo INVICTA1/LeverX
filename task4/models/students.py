@@ -10,7 +10,7 @@ class Student():
         self.sex = sex
 
     def __repr__(self):
-        return '{id},{birthday},{name},{room},{sex})'.format(id=self.id,
+        return "{id},'{birthday}','{name}',{room},'{sex}'".format(id=self.id,
                                                              birthday=self.birthday,
                                                              name=self.name,
                                                              room=self.room,
@@ -25,7 +25,7 @@ class StudentFileReader():
             with open(path, 'r') as file:
                 students = json.loads(file.read())
                 students = [
-                    Student(student['id'], student['name'], student['room'], student['sex'], student['birthday']) for
+                    Student(student['id'],student['birthday'], student['name'], student['room'], student['sex'] ) for
                     student in students]
             return students
         except FileNotFoundError:

@@ -8,7 +8,7 @@ class Room():
         self.name = name
 
     def __repr__(self):
-        return '{id}, {name}'.format(id=self.id, name=self.name)
+        return "{id}, '{name}'".format(id=self.id, name=self.name)
 
 
 class RoomsFileReader():
