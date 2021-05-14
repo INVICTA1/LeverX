@@ -1,16 +1,12 @@
 import json
+from dataclasses import dataclass
 
 
+@dataclass()
 class Student():
-    def __init__(self, id: int, name: str, room: int):
-        self.id = id
-        self.name = name
-        self.room = room
-
-    def __repr__(self):
-        return '({id}; {name};{room})'.format(id=self.id,
-                                              name=self.name,
-                                              room=self.room)
+    id: int
+    name: str
+    room: int
 
 
 class StudentFileReader():

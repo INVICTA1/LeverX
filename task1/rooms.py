@@ -1,14 +1,11 @@
 import json
+from dataclasses import dataclass
 
 
+@dataclass()
 class Room():
-
-    def __init__(self, id: int, name: str):
-        self.id = id
-        self.name = name
-
-    def __repr__(self):
-        return '({id}; {name})'.format(id=self.id, name=self.name)
+    id: int
+    name: str
 
 
 class RoomsFileReader():
