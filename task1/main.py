@@ -2,8 +2,8 @@ import argparse
 import sys
 import json
 from lxml import etree
-from students import *
-from rooms import *
+from students import Student, StudentFileReader
+from rooms import Room, RoomsFileReader
 
 
 def combine_rooms_and_students(rooms: list, students: list) -> dict:
@@ -59,8 +59,8 @@ def output_json(result: dict):
     try:
         with open(name_file, 'w+', encoding='utf-8', ) as file:
             json.dump(result, file, ensure_ascii=False, indent=4)
-    except BaseException as e:
-        raise Exception("Can't' output JSON data", e)
+    except Exception as MyException:
+        raise Exception("Can't' output JSON data", MyException)
 
 
 def main():
