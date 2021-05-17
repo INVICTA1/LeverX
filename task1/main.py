@@ -1,6 +1,4 @@
 import argparse
-import json
-from lxml import etree
 from students import Student, StudentFileReader
 from rooms import Room, RoomsFileReader
 from serializer import XMLSerializer, JsonSerializer
