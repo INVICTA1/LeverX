@@ -10,44 +10,44 @@ class Version:
 
     def get_processing_version(self, version: str) -> list:
         """Pre-processing the version"""
-        cmp = 0
-        for num in version.split('.'):
-            if not num.isdigit():
-                cmp = 1
+
         for key, value in self.abbr.items():
             version = re.sub(key, value, version)
-        return cmp, version
+        return version.split('.')
 
     def __lt__(self, other):
         """Checking the version by the condition less than"""
-        if self.version[0] > other.version[0]:
-            return True
-        versions = zip_longest(self.version[1], other.version[1], fillvalue='0')
+
+        min_len = min(len(self.version), len(other.version))
+        if self.version[:min_len] == other.version[:min_len]:
+            return len(self.version) > len(other.version)
+        versions = zip_longest(self.version, other.version, fillvalue='0')
         for i, j in versions:
             if i.isdigit() and j.isdigit() and i != j:
                 return i < j
-        return len(self.version[1]) > len(other.version[1])
+        return len(self.version) > len(other.version)
 
     def __gt__(self, other):
         """Checking the version by the condition more than"""
 
-        if self.version[0] < other.version[0]:
-            return True
-        versions = zip_longest(self.version[1], other.version[1], fillvalue='0')
+        min_len = min(len(self.version), len(other.version))
+        if self.version[:min_len] == other.version[:min_len]:
+            return len(self.version) < len(other.version)
+
+        versions = zip_longest(self.version, other.version, fillvalue='0')
         for i, j in versions:
             if i.isdigit() and j.isdigit() and i != j:
                 return i > j
-        return len(self.version[1]) < len(other.version[1])
+        return len(self.version) < len(other.version)
 
     def __ne__(self, other):
         """Checking the version by the not equal condition"""
-        if self.version[0] != other.version[0]:
-            return True
-        versions = zip_longest(self.version[1], other.version[1], fillvalue='0')
+
+        versions = zip_longest(self.version, other.version, fillvalue='0')
         for i, j in versions:
             if i.isdigit() and j.isdigit() and i != j:
                 return True
-        return len(self.version[1]) != len(other.version[1])
+        return len(self.version) != len(other.version)
 
 
 def main():
