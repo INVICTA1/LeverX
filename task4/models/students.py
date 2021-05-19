@@ -1,21 +1,15 @@
 import json
+from dataclasses import dataclass
 from mysql.connector import Error
 
 
+@dataclass()
 class Student():
-    def __init__(self, id: int, birthday: str, name: str, room: int, sex: chr):
-        self.id = id
-        self.birthday = birthday
-        self.name = name
-        self.room = room
-        self.sex = sex
-
-    def __repr__(self):
-        return "({id},{birthday},{name},{room},{sex})".format(id=self.id,
-                                                                  birthday=self.birthday,
-                                                                  name=self.name,
-                                                                  room=self.room,
-                                                                  sex=self.sex)
+    id: int
+    birthday: str
+    name: str
+    room: int
+    sex: chr
 
 
 class StudentFileReader():
@@ -37,11 +31,11 @@ class StudentFileReader():
 
 class StudentDB():
     @staticmethod
-    def load_students_to_db(db: str, students: list, cursor):
+    def load_students_to_db(cursor,db: str, students: list):
         try:
             cursor.execute('USE {db}'.format(db=db))
             for student in students:
                 params = (student.id, student.birthday, student.name, student.room, student.sex)
-                cursor.execute("INSERT INTO students  VALUES(%s,%s,%s,%s,%s)",params )
+                cursor.execute("INSERT INTO students  VALUES(%s,%s,%s,%s,%s)", params)
         except Error as e:
             raise Exception("Can't load students to db", e)

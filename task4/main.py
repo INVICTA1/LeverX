@@ -1,22 +1,12 @@
 import argparse
 import sys
-import mysql.connector
 import json
 from lxml import etree
-from mysql.connector import Error
-from models.students import *
-from models.rooms import *
+from models.students import StudentFileReader, StudentDB, Student
+from models.rooms import RoomsFileReader, RoomsDB, Room
+from models.sqlreader import PathFinder, SqlDB, SqlFileReader
+from models.serializer import XMLSerializer, JsonSerializer
 from config import config
-
-
-def connect_to_database(config):
-    """Connect to mysql server with config params"""
-
-    try:
-        conn = mysql.connector.connect(**config)
-        return conn
-    except Error as e:
-        raise ("Can't connect to database", e)
 
 
 def get_parser_arguments():
@@ -30,51 +20,6 @@ def get_parser_arguments():
     return parser
 
 
-def call_procedure(cursor, procedure):
-    """Call procedure and return result"""
-
-    try:
-        cursor.callproc(procedure)
-        for result in cursor.stored_results():
-            return result.fetchall()
-    except (BaseException, Error) as e:
-        raise ("Can't call procedure", e)
-
-
-def output_json(result, name_procedure: str):
-    """Output data to a JSON file"""
-
-    name_file = r'result\json\\' + name_procedure + '.json'
-    print(result)
-    try:
-        with open(name_file, 'w+', encoding='utf-8', ) as file:
-            json.dump(result, file, ensure_ascii=False, indent=4)
-    except BaseException as e:
-        raise Exception("Can't' output JSON data", e)
-
-
-def output_xml(result, name_procedure: str):
-    """Output data to a XML file"""
-
-    name_file = r'result\xml\\' + name_procedure + '.xml'
-    try:
-        data = etree.Element('data')
-        for row in result:
-            if len(row) == 2:
-                room = etree.SubElement(data, 'room')
-                room.text = row[0]
-                num_students = etree.SubElement(room, 'num_students')
-                num_students.text = str(row[1])
-            elif len(row) == 1:
-                room = etree.SubElement(data, 'room')
-                room.text = row[0]
-        data = etree.ElementTree(data)
-        with open(name_file, 'wb') as file:
-            data.write(file, xml_declaration=True, pretty_print=True)
-    except Exception as MyException:
-        raise MyException
-
-
 def main():
     procedures = [
         'usp_find_list_rooms_with_students',
@@ -82,26 +27,34 @@ def main():
         'usp_top5_rooms_with_diff_age',
         'usp_find_list_rooms_with_mixed_students',
     ]
+    sql_dirs = [
+        'databases',
+        'tables',
+        'procedures',
+    ]
+    extension = '.sql'
+    db_dir = 'db\\'
+    output_file = {'xml': XMLSerializer.output_xml, 'json': JsonSerializer.output_json}
     parser = get_parser_arguments()
     namespace = parser.parse_args(sys.argv[1:])
-    conn = connect_to_database(config)
-    if conn:
-        # students = StudentFileReader.read_file(namespace.students)
-        # rooms = RoomsFileReader.read_file(namespace.rooms)
+    with SqlDB.connect_to_database(config) as conn:
         cursor = conn.cursor()
-        # upload sql
-        # RoomsDB.load_rooms_to_db(config['database'], rooms, cursor)
-        # StudentDB.load_students_to_db(config['database'], students, cursor)
-        # добавить индекс
-        # conn.commit()
+        sql_files = PathFinder.find_path_files(dirs=sql_dirs, path=db_dir, extension=extension)
+        SqlDB.upload_sql_files(cursor, path_files=sql_files)
+
+        students = StudentFileReader.read_file(namespace.students)
+        rooms = RoomsFileReader.read_file(namespace.rooms)
+
+        RoomsDB.load_rooms_to_db(cursor, db=config['database'], rooms=rooms, )
+        StudentDB.load_students_to_db(cursor, db=config['database'], students=students)
+
+        SqlDB.create_index(cursor, index='in_std_room', table='students', column='room')
+
+        conn.commit()
         for procedure in procedures:
-            result = call_procedure(cursor, procedure)
-            if namespace.format == 'xml':
-                output_xml(result, procedure)
-            elif namespace.format == 'json':
-                output_json(result, procedure)
-        cursor.close()
-        conn.close()
+            result = SqlDB.call_procedure(cursor, procedure)
+            name_file = procedure + '.' + namespace.format
+            output_file[namespace.format](result, name_file)
 
 
 if __name__ == '__main__':

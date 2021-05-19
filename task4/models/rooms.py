@@ -1,15 +1,12 @@
 import json
 from mysql.connector import Error
+from dataclasses import dataclass
 
 
+@dataclass()
 class Room():
-
-    def __init__(self, id: int, name: str):
-        self.id = id
-        self.name = name
-
-    def __repr__(self):
-        return "({id}, {name})".format(id=self.id, name=self.name)
+    id: int
+    name: str
 
 
 class RoomsFileReader():
@@ -29,7 +26,7 @@ class RoomsFileReader():
 
 class RoomsDB():
     @staticmethod
-    def load_rooms_to_db(db: str, rooms: list, cursor):
+    def load_rooms_to_db(cursor, db: str, rooms: list):
         try:
             cursor.execute('USE {db}'.format(db=db))
             for room in rooms:
