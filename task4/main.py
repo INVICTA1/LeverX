@@ -40,6 +40,9 @@ def main():
     with SqlDB.connect_to_database(config) as conn:
         cursor = conn.cursor()
         sql_files = PathFinder.find_path_files(dirs=sql_dirs, path=db_dir, extension=extension)
+        for file in sql_files:
+            sql_file = SqlFileReader.read_sql_files(file)
+            SqlDB.upload_sql_file(cursor, sql_file)
         SqlDB.upload_sql_files(cursor, path_files=sql_files)
 
         students = StudentFileReader.read_file(namespace.students)

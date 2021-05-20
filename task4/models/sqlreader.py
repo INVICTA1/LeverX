@@ -37,13 +37,12 @@ class PathFinder():
 
 class SqlFileReader():
     @staticmethod
-    def read_sql_files(file_paths: list):
+    def read_sql_files(file_path: str):
         """Parsing sql script and executing this code"""
 
         try:
-            for file_path in file_paths:
-                with open(file_path) as sql_file:
-                    sql_script = sql_file.read().strip()
+            with open(file_path) as sql_file:
+                return sql_file.read().strip()
         except (Exception) as e:
             raise ("Can't read SQL files", e)
 
@@ -83,26 +82,25 @@ class SqlDB():
             raise ("Can't execute sql script", e)
 
     @staticmethod
-    def upload_sql_files(cursor, path_files: list):
+    def upload_sql_file(cursor, sql_script):
         """Parsing sql script and executing this code"""
 
         try:
-            for path_file in path_files:
-                with open(path_file) as sql_file:
-                    sql_script = sql_file.read().strip()
-                    instructions = re.findall('\$\$([^$]*)\$\$', sql_script)
-                    if instructions:
-                        sql_script = re.findall('([^$]*)DELIMITER', sql_script)[0]
-                        SqlDB.execute_sql_script(cursor, sql_script)
-                        for instruction in instructions:
-                            cursor.execute(instruction)
-                    else:
-                        SqlDB.execute_sql_script(cursor, sql_script)
+            instructions = re.findall('\$\$([^$]*)\$\$', sql_script)
+            if instructions:
+                sql_script = re.findall('([^$]*)DELIMITER', sql_script)[0]
+                SqlDB.execute_sql_script(cursor, sql_script)
+                for instruction in instructions:
+                    cursor.execute(instruction)
+            else:
+                SqlDB.execute_sql_script(cursor, sql_script)
         except (Exception, Error) as e:
             raise ("Can't upload SQL files", e)
 
     @staticmethod
     def create_index(cursor, index, table, column):
+        """Creating index in Mysql Table"""
+
         cursor.execute('create index {index} on {table}({column});'.format(index=index,
                                                                            table=table,
                                                                            column=column))
