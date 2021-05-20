@@ -1,7 +1,5 @@
 import argparse
 import sys
-import json
-from lxml import etree
 from models.students import StudentFileReader, StudentDB, Student
 from models.rooms import RoomsFileReader, RoomsDB, Room
 from models.sqlreader import PathFinder, SqlDB, SqlFileReader
@@ -43,7 +41,6 @@ def main():
         for file in sql_files:
             sql_file = SqlFileReader.read_sql_files(file)
             SqlDB.upload_sql_file(cursor, sql_file)
-        SqlDB.upload_sql_files(cursor, path_files=sql_files)
 
         students = StudentFileReader.read_file(namespace.students)
         rooms = RoomsFileReader.read_file(namespace.rooms)

@@ -1,6 +1,6 @@
 import os
-import mysql.connector
 import re
+import mysql.connector
 from mysql.connector import Error
 
 
