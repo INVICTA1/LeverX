@@ -13,14 +13,16 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import re_path, include
-from .views import CourseListView, TeacherListView, CourseCreateView
+from django.urls import path, include
+from .views import LoginAPIView, RegistrationAPIView, UserViewList
+from rest_framework_simplejwt import views as jwt_views
+app_name = 'mysite'
 
-app_name = 'testing'
 urlpatterns = [
-    re_path('^course/$', CourseListView.as_view()),
-    re_path('^course/create/$', CourseCreateView.as_view()),
-
-    re_path('^teachers/$', TeacherListView.as_view()),
+    path('registration/', RegistrationAPIView.as_view(), name='user_registration'),
+    path(r'login/', LoginAPIView.as_view(), name='user_login'),
+    path(r'users/', UserViewList.as_view(), name='all_users'),
+    path('api/token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
 
 ]
