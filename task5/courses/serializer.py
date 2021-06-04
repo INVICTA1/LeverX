@@ -1,15 +1,17 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from .models import Course, Lecture, Homework, Comment
+from .models import Course, Lecture, Homework, Comment, Solution
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(read_only=True)
+
     class Meta:
         model = User
-        fields = ('username', 'email')
+        fields = ('username', 'email', 'profile')
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -42,29 +44,39 @@ class LectureAllSerializer(serializers.ModelSerializer):
 
 class HomeworkSerializer(serializers.ModelSerializer):
     lecture = LectureSerializer(read_only=True)
-    evaluation = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Homework
-        fields = ('id', 'work', 'evaluation', 'lecture')
+        fields = ('id', 'task', 'lecture')
 
 
-class HomeworkAllSerializer(serializers.ModelSerializer):
+class SolutionSerializer(serializers.ModelSerializer):
+    homework = serializers.PrimaryKeyRelatedField(read_only=True)
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    rating = serializers.IntegerField(read_only=True)
+
     class Meta:
-        model = Homework
-        fields = ('id', 'work', 'status', 'evaluation', 'lecture')
+        model = Solution
+        fields = ('id', 'solution', 'status', 'rating', 'homework', 'user')
 
 
-class EvaluationSerializer(serializers.ModelSerializer):
+class RatingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Homework
-        fields = ('id', 'evaluation')
+        model = Solution
+        fields = ('id', 'rating')
 
 
 class CommentSerializer(serializers.ModelSerializer):
     user = UserSerializer(many=True, read_only=True)
-    homework = HomeworkSerializer(many=True, read_only=True)
+    solution = SolutionSerializer(many=True, read_only=True)
 
     class Meta:
         model = Comment
-        fields = ('id', 'user', 'homework', 'comment')
+        fields = ('id', 'comment', 'user', 'solution')
+
+
+class CommentListSerializer(serializers.ModelSerializer):
+    class Meta:
+
+        model = Comment
+        fields = ('id', 'comment')
